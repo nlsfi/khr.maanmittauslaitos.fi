@@ -1,0 +1,491 @@
+---
+swagger: '2.0'
+info:
+  version: 1.3.0
+  title: REST API for Statistical information on real estate transactions 
+  description: Proof-of-Concept specification / REST API for Statistical information on real estate transactions.
+  contact:
+    name: "API Support"
+    url: "hhttp://www.maanmittauslaitos.fi/kiinteistot/asiantuntevalle-kayttajalle/kiinteistotietojen-rajapintapalvelut/kiinteistokauppojen"
+    email: "sovellustuki@maanmittauslaitos.fi"
+  license:
+    name: "Maanmittauslaitoksen avoimen tietoaineiston CC 4.0 -lisenssi"
+    url: "http://www.maanmittauslaitos.fi/kartat-ja-paikkatieto/asiantuntevalle-kayttajalle/maastotiedot-ja-niiden-hankinta/avoimen"
+host: khr.maanmittauslaitos.fi
+schemes: ["https"]
+basePath: "/tilastopalvelu/rest/1.1"
+paths:
+
+  /codelists:
+    get:
+      operationId: getAPICodelists
+      summary: returns API codelists as JSON
+      description: Displays a list of codelists and localised texts
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/CodelistsResponse'
+
+  /groups:
+    get:
+      operationId: getGroups
+      summary: Get a list of groups
+      description: Displays a list of all groups on the server. Use the 'Accept:' header to specify format or 
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/RootGroupsResponse'
+          examples:
+            application/json: '{}'
+
+  /groups/{GroupID}:            
+    get:
+      operationId: getGroupByID
+      summary: Get Group by ID
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/GroupsResponse'
+      parameters:
+        - name: GroupID
+          in: path
+          description: ID of Indicator to fetch
+          required: true
+          type: integer
+          format: integer
+
+  /groups/{GroupID}/indicators:            
+    get:
+      operationId: getIndicatorsByGroupID
+      summary: Get Indicators by GroupID
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/IndicatorsResponse'
+      parameters:
+        - name: GroupID
+          in: path
+          description: ID of Indicator to fetch
+          required: true
+          type: integer
+          format: integer          
+          
+  /indicators:            
+    get:
+      operationId: getIndicators
+      summary: Get a list of Indicators
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/IndicatorsResponse'
+              
+  /indicators/{IndicatorID}:            
+    get:
+      operationId: getIndicatorByID
+      summary: Get Indicators by ID
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Indicator'
+      parameters:
+        - name: IndicatorID
+          in: path
+          description: ID of Indicator to fetch
+          required: true
+          type: integer
+          format: integer
+        
+  /indicators/{IndicatorID}/data:            
+    get:
+      operationId: getIndicatorFactsByID
+      summary: Get Indicator Facts by ID
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/FactsResponse'
+      parameters:
+        - name: IndicatorID
+          in: path
+          description: ID of Indicator to fetch
+          required: true
+          type: integer
+          format: integer
+        - name: years
+          in: query
+          type: array
+          collectionFormat: multi
+          items:
+            type: integer
+          required: true
+          
+          
+  /regions/{RegionID}:
+    get:
+      operationId: getRegionInfo
+      summary: get Region basic information by ID
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/RegionsResponse'
+      parameters:
+        - name: RegionID
+          in: path
+          description: ID of Region to Fetch
+          required: true
+          type: integer
+          format: integer
+        
+  /regions/{RegionID}/geometry:
+    get:
+      operationId: getRegionGeometry
+      summary: get Region spatial dimension
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+      parameters:
+        - name: RegionID
+          in: path
+          description: ID of Region to Fetch
+          required: true
+          type: integer
+          format: integer 
+  
+  /categories/{CategoryID}/regions:
+    get:
+      operationId: getRegionsForCategory
+      summary: get Regions list for category
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/RegionsResponse'
+      parameters:
+        - name: CategoryID
+          in: path
+          description: ID of category to fetch regions
+          required: true
+          type: string
+          enum: 
+            - MAA
+            - MAAKUNTA
+            - SEUTUKUNTA
+            - KUNTA
+            - HILA30X30
+            - HILA10X10
+            - HILA5X5
+
+  /categories/{CategoryID}/regions/geometry:
+    get:
+      operationId: getRegionGeometriesForCategory
+      summary: get Region Geometries for category
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+      parameters:
+        - name: CategoryID
+          in: path
+          description: ID of category to fetch regions
+          required: true
+          type: string
+          enum: 
+            - MAA          
+            - MAAKUNTA
+            - SEUTUKUNTA
+            - KUNTA
+            - HILA30X30            
+            - HILA10X10
+            - HILA5X5
+        
+  /categories/{CategoryID}/indicators/{IndicatorID}/data:            
+    get:
+      operationId: getIndicatorFactsByIDInCategory
+      summary: Get Indicator Facts by ID in Category
+      produces:
+        - application/json
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/FactsResponse'
+      parameters:
+        - name: CategoryID
+          in: path
+          description: ID of category to fetch indicator data
+          required: true
+          type: string
+          enum: 
+            - MAA          
+            - MAAKUNTA
+            - SEUTUKUNTA
+            - KUNTA
+            - HILA30X30            
+            - HILA10X10
+            - HILA5X5      
+        - name: IndicatorID
+          in: path
+          description: ID of Indicator to fetch
+          required: true
+          type: integer
+          format: integer
+        - name: years
+          in: query
+          type: array
+          collectionFormat: multi
+          items:
+            type: integer
+          required: true        
+
+definitions:
+
+  FactsResponse:
+    type: array
+    items: 
+      $ref: '#/definitions/Fact'
+      
+  Fact:
+    type: object
+    properties:
+      indicator:
+        $ref: '#/definitions/IndicatorID' 
+      region:
+        $ref: '#/definitions/RegionID'
+      year: 
+        type: integer
+      gender: 
+        type: string
+      value: 
+        type: number
+    
+  IndicatorsResponse:
+    type: array
+    items:
+      $ref: '#/definitions/Indicator'
+
+  CodelistsResponse:
+    title: CodelistsResponse
+    type: object
+    additionalProperties:
+        $ref: '#/definitions/CodeList'
+  
+  CodeList:
+    title: CodeList
+    type: object
+    properties:
+      codeListType:
+        type: string
+        enum: [api]
+      codeList:
+        type: string
+      title:
+        $ref: '#/definitions/LocalisedString' 
+      codeValueList:
+        type: array
+        items:
+          type: string
+      codeValues:
+        $ref: '#/definitions/CodeValueMap'
+        
+      
+  CodeValueMap:
+    additionalProperties:
+        $ref: '#/definitions/CodeValue'
+        
+  CodeValue:
+    title: CodeValue
+    type: object
+    properties:
+      code:
+        type: string
+      title:
+        $ref: '#/definitions/LocalisedString'
+        
+      
+        
+  RootGroupsResponse:
+    title: GroupsResponse
+    type: object
+    properties:
+      groups: 
+        $ref: '#/definitions/RootGroupsMap'
+  
+  GroupsResponse:
+    title: GroupsResponse
+    type: object
+    properties:
+      groups: 
+        $ref: '#/definitions/ChildGroupsMap'
+
+  RootGroupsMap:
+    title: RootGroup
+    type: object
+    properties:
+      g4096:
+        $ref: '#/definitions/Group'
+
+        
+
+  
+  GroupID:
+    title: 'Group ID'
+    type: integer
+    
+  Group:
+    title: Group
+    type: object
+    properties: 
+      id:
+        $ref: '#/definitions/GroupID'
+      title:
+        $ref: '#/definitions/LocalisedString'
+      description:
+        $ref: '#/definitions/LocalisedString'
+      children:
+        $ref: '#/definitions/ChildGroupsMap'        
+      indicators: 
+        type: array
+        items:
+          $ref: '#/definitions/IndicatorID'
+  
+  ChildGroupsMap:
+    title: GroupHierarchy
+    type: object
+    additionalProperties:
+      $ref: '#/definitions/Group'
+
+  RegionID:
+    title: 'Region ID'
+    type: integer
+    
+  Region:
+    type: object
+    
+  RegionsResponse:
+    type: array
+    items:
+      $ref: '#/definitions/Region'
+
+  IndicatorID:
+    title: 'Indicator ID'
+    type: integer
+    
+  Range:
+    type: object
+    properties:
+      start: 
+        type: integer
+        minimum: 1990
+      end:
+        type: integer
+        
+  ValueType:
+    type: object
+    properties:
+      code: 
+        type: string
+      title: 
+        $ref: '#/definitions/LocalisedString'
+        
+  ClassificationID:
+    title: 'Classification ID'
+    type: string
+    
+  Classification:
+    type: object
+    properties:
+      title: 
+        $ref: '#/definitions/LocalisedString'
+      values:
+        type: array
+        items:
+          $ref: '#/definitions/ClassificationID'
+    
+  ClassificationsMap:
+    type: object
+    additionalProperties:
+      $ref: '#/definitions/Classification'
+  
+  OrganizationID: 
+    type: integer
+  
+  Organization:
+    type: object
+    properties:
+      id: 
+        $ref: '#/definitions/OrganizationID'
+      title:
+        $ref: '#/definitions/LocalisedString'
+        
+        
+  
+  
+  Indicator:
+    type: object
+    properties:
+      id:
+        $ref: '#/definitions/IndicatorID'
+      data-updated:
+        type: string
+        format: date
+      range:
+        $ref: '#/definitions/Range'
+      title:
+        $ref: '#/definitions/LocalisedString'
+      description:
+        $ref: '#/definitions/LocalisedString'
+      interpretation:
+        $ref: '#/definitions/LocalisedString'    
+      limits:
+        $ref: '#/definitions/LocalisedString'
+      legislation:
+        $ref: '#/definitions/LocalisedString'
+      notices:
+        $ref: '#/definitions/LocalisedString'
+      primaryValueType:
+        $ref: '#/definitions/ValueType'
+      decimals:
+        type: integer
+      classifications:
+        $ref: '#/definitions/ClassificationsMap'
+      organization: 
+        $ref: '#/definitions/Organization'
+      
+  LocalisedString:
+    title: localised string
+    type: object
+    properties:
+      fi: 
+        type: string
+      sv: 
+        type: string
+      en:
+        type: string
